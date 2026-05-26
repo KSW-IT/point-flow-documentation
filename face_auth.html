@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Authentication API Documentation</title>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px;
+            line-height: 1.7;
+            background: #fafafa;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #222;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: monospace;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        hr {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Face Authentication API Documentation</h1>
+
+    <p>
+        This documentation covers the Face Authentication system including
+        endpoint reference and internal business logic.
+    </p>
+
+    <hr>
+
+    <h2>POST /api/auth/face/register</h2>
+
+    <h3>Purpose</h3>
+
+    <p>
+        Register user face biometric data for future authentication.
+    </p>
+
+    <h3>Request Body</h3>
+
+    <pre>
+{
+  "userId": "usr_123",
+  "faceEmbedding": [0.245, 0.832, 0.421],
+  "deviceId": "iphone-15-pro"
+}
+    </pre>
+
+    <h3>Success Response</h3>
+
+    <pre>
+{
+  "success": true,
+  "message": "Face registered successfully"
+}
+    </pre>
+
+    <h3>Error Response</h3>
+
+    <pre>
+400 Invalid face data
+409 Face already registered
+500 Server error
+    </pre>
+
+    <h3>Business Logic</h3>
+
+    <div class="mermaid">
+        flowchart TD
+
+        A[Receive Face Embedding]
+        --> B[Validate User Session]
+
+        B --> C[Check User Exists]
+
+        C --> D[Validate Embedding Format]
+
+        D --> E[Encrypt Biometric Data]
+
+        E --> F[Save To Database]
+
+        F --> G[Link To User Profile]
+
+        G --> H[Return Success Response]
+    </div>
+
+    <hr>
+
+    <h2>POST /api/auth/face/verify</h2>
+
+    <h3>Purpose</h3>
+
+    <p>
+        Authenticate user using face recognition.
+    </p>
+
+    <h3>Request Body</h3>
+
+    <pre>
+{
+  "faceEmbedding": [0.245, 0.832, 0.421],
+  "deviceId": "iphone-15-pro"
+}
+    </pre>
+
+    <h3>Success Response</h3>
+
+    <pre>
+{
+  "success": true,
+  "token": "jwt_token_here",
+  "user": {
+    "id": "usr_123",
+    "name": "Rem"
+  }
+}
+    </pre>
+
+    <h3>Error Response</h3>
+
+    <pre>
+401 Face not recognized
+403 Liveness check failed
+404 User not found
+500 Server error
+    </pre>
+
+    <h3>Business Logic</h3>
+
+    <div class="mermaid">
+        flowchart TD
+
+        A[Open Camera]
+        --> B[Capture Live Face]
+
+        B --> C[Run Liveness Detection]
+
+        C --> D[Convert To Embedding Vector]
+
+        D --> E[Send Vector To Backend]
+
+        E --> F[Validate Payload]
+
+        F --> G[Fetch Stored Embeddings]
+
+        G --> H[Compare Face Vectors]
+
+        H --> I{Similarity Above Threshold}
+
+        I -->|Yes| J[Generate JWT Token]
+
+        J --> K[Store Login Session]
+
+        K --> L[Return User Data]
+
+        I -->|No| M[Authentication Failed]
+    </div>
+
+    <hr>
+
+    <h2>Authentication Flow</h2>
+
+    <div class="mermaid">
+        sequenceDiagram
+
+        participant User
+        participant Frontend
+        participant Camera
+        participant Backend
+        participant Database
+        participant MatchingService
+
+        User->>Frontend: Open Face Login
+
+        Frontend->>Camera: Capture Face
+
+        Camera-->>Frontend: Face Image
+
+        Frontend->>Backend: POST Face Verify
+
+        Backend->>Database: Fetch Stored Embedding
+
+        Database-->>Backend: Return Stored Vector
+
+        Backend->>MatchingService: Compare Face Vectors
+
+        MatchingService-->>Backend: Return Match Score
+
+        Backend-->>Frontend: JWT Token And User Profile
+    </div>
+
+    <hr>
+
+    <h2>Database Tables</h2>
+
+    <h3>users</h3>
+
+    <table>
+        <tr>
+            <th>Column</th>
+        </tr>
+        <tr>
+            <td>id</td>
+        </tr>
+        <tr>
+            <td>name</td>
+        </tr>
+        <tr>
+            <td>email</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+        </tr>
+    </table>
+
+    <h3>face_auth_profiles</h3>
+
+    <table>
+        <tr>
+            <th>Column</th>
+        </tr>
+        <tr>
+            <td>id</td>
+        </tr>
+        <tr>
+            <td>user_id</td>
+        </tr>
+        <tr>
+            <td>encrypted_embedding</td>
+        </tr>
+        <tr>
+            <td>device_id</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+        </tr>
+        <tr>
+            <td>updated_at</td>
+        </tr>
+    </table>
+
+    <h3>auth_sessions</h3>
+
+    <table>
+        <tr>
+            <th>Column</th>
+        </tr>
+        <tr>
+            <td>id</td>
+        </tr>
+        <tr>
+            <td>user_id</td>
+        </tr>
+        <tr>
+            <td>jwt_token</td>
+        </tr>
+        <tr>
+            <td>expires_at</td>
+        </tr>
+        <tr>
+            <td>device_id</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>Security Notes</h2>
+
+    <ul>
+        <li>Never store raw face image unless required</li>
+        <li>Store encrypted embedding vectors</li>
+        <li>Apply liveness detection against spoofing</li>
+        <li>Use HTTPS for all APIs</li>
+        <li>Apply JWT expiry</li>
+        <li>Audit failed authentication attempts</li>
+        <li>Use device binding when possible</li>
+    </ul>
+
+</body>
+
+</html>
