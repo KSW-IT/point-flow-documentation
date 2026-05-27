@@ -135,11 +135,11 @@ flowchart TD
 
     D --> E[Insert giv_pnt]
 
-    E --> F[Deduct branch_info]
+    E --> F[Deduct point from branch_info]
 
-    F --> G[Add driver_point]
+    F --> G[Add point driver_point_record]
 
-    G --> H[Insert driver_point_record]
+    G --> H[Insert transcation driver_point_record]
 
     H --> I[Success Response]
 
