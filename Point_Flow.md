@@ -63,6 +63,13 @@ flowchart TD
     C --> D[Insert Into cdt_pnt Table]
 
     D --> E[Update Branch Balance]
+
+    %% Styles
+    style A fill:#1E3A8A,color:#ffffff,stroke:#0F172A,stroke-width:2px
+    style B fill:#2563EB,color:#ffffff,stroke:#1E40AF,stroke-width:2px
+    style C fill:#0F766E,color:#ffffff,stroke:#134E4A,stroke-width:2px
+    style D fill:#7C3AED,color:#ffffff,stroke:#4C1D95,stroke-width:2px
+    style E fill:#059669,color:#ffffff,stroke:#065F46,stroke-width:2px
 ```
 
 ---
@@ -139,11 +146,23 @@ flowchart TD
 
     F --> G[Add point driver_point_record]
 
-    G --> H[Insert transcation driver_point_record]
+    G --> H[Insert transaction driver_point_record]
 
     H --> I[Success Response]
 
     C -->|No| J[Insufficient Point Error]
+
+    %% Styles
+    style A fill:#1E3A8A,color:#ffffff,stroke:#0F172A,stroke-width:2px
+    style B fill:#2563EB,color:#ffffff,stroke:#1E40AF,stroke-width:2px
+    style C fill:#D97706,color:#ffffff,stroke:#92400E,stroke-width:2px
+    style D fill:#0F766E,color:#ffffff,stroke:#134E4A,stroke-width:2px
+    style E fill:#7C3AED,color:#ffffff,stroke:#4C1D95,stroke-width:2px
+    style F fill:#DC2626,color:#ffffff,stroke:#7F1D1D,stroke-width:2px
+    style G fill:#059669,color:#ffffff,stroke:#065F46,stroke-width:2px
+    style H fill:#9333EA,color:#ffffff,stroke:#581C87,stroke-width:2px
+    style I fill:#16A34A,color:#ffffff,stroke:#14532D,stroke-width:2px
+    style J fill:#B91C1C,color:#ffffff,stroke:#7F1D1D,stroke-width:2px
 ```
 
 ---
@@ -208,6 +227,15 @@ flowchart TD
     E --> F[Success Response]
 
     C -->|Yes| G[Return Error]
+
+    %% Styles
+    style A fill:#1E3A8A,color:#ffffff,stroke:#0F172A,stroke-width:2px
+    style B fill:#2563EB,color:#ffffff,stroke:#1E40AF,stroke-width:2px
+    style C fill:#D97706,color:#ffffff,stroke:#92400E,stroke-width:2px
+    style D fill:#7C3AED,color:#ffffff,stroke:#4C1D95,stroke-width:2px
+    style E fill:#0F766E,color:#ffffff,stroke:#134E4A,stroke-width:2px
+    style F fill:#16A34A,color:#ffffff,stroke:#14532D,stroke-width:2px
+    style G fill:#B91C1C,color:#ffffff,stroke:#7F1D1D,stroke-width:2px
 ```
 
 ---
@@ -252,6 +280,12 @@ flowchart TD
     B --> C[Cancel Withdrawal Request]
 
     C --> D[Update Request Status]
+
+    %% Styles
+    style A fill:#1E3A8A,color:#ffffff,stroke:#0F172A,stroke-width:2px
+    style B fill:#2563EB,color:#ffffff,stroke:#1E40AF,stroke-width:2px
+    style C fill:#DC2626,color:#ffffff,stroke:#7F1D1D,stroke-width:2px
+    style D fill:#7C3AED,color:#ffffff,stroke:#4C1D95,stroke-width:2px
 ```
 
 ---
@@ -321,6 +355,16 @@ flowchart TD
     F --> G
 
     G --> H[Response Completed]
+
+    %% Styles
+    style A fill:#1E3A8A,color:#ffffff,stroke:#0F172A,stroke-width:2px
+    style B fill:#2563EB,color:#ffffff,stroke:#1E40AF,stroke-width:2px
+    style C fill:#D97706,color:#ffffff,stroke:#92400E,stroke-width:2px
+    style D fill:#16A34A,color:#ffffff,stroke:#14532D,stroke-width:2px
+    style E fill:#B91C1C,color:#ffffff,stroke:#7F1D1D,stroke-width:2px
+    style F fill:#F59E0B,color:#000000,stroke:#92400E,stroke-width:2px
+    style G fill:#7C3AED,color:#ffffff,stroke:#4C1D95,stroke-width:2px
+    style H fill:#059669,color:#ffffff,stroke:#065F46,stroke-width:2px
 ```
 
 ---
@@ -346,42 +390,69 @@ sequenceDiagram
     participant Database
 
     Admin->>System: creditPoints Request
+    activate System
 
     System->>Database: Insert cdt_pnt
+    activate Database
+    Database-->>System: Success
+    deactivate Database
 
     System-->>Admin: Success Response
+    deactivate System
 
     BranchManager->>System: givePoints Request
+    activate System
 
     System->>Database: Check Branch Balance
+    activate Database
 
     alt Enough Point
 
+        Database-->>System: Balance OK
+
         System->>Database: Insert giv_pnt
-
         System->>Database: Update branch_info
-
         System->>Database: Update driver_point
-
         System->>Database: Insert driver_point_record
+
+        Database-->>System: Transaction Success
 
         System-->>BranchManager: Success Response
 
     else Insufficient Point
 
+        Database-->>System: Insufficient Balance
+
         System-->>BranchManager: Error Response
 
     end
 
+    deactivate Database
+    deactivate System
+
     Driver->>System: withdrawPointsRequest
+    activate System
 
     System->>Database: Insert req_pnt
+    activate Database
+
+    Database-->>System: Request Created
 
     System-->>Driver: Withdrawal Request Created
 
+    deactivate Database
+    deactivate System
+
     BranchManager->>System: responseWithdrawRequest
+    activate System
 
     System->>Database: Update req_pnt
+    activate Database
+
+    Database-->>System: Updated
 
     System-->>BranchManager: Response Completed
+
+    deactivate Database
+    deactivate System
 ```
