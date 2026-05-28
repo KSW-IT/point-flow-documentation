@@ -352,7 +352,7 @@ flowchart TD
 | Endpoint             | Method | Description (EN)          | Description (JP)           |
 |----------------------|--------|---------------------------|----------------------------|
 | /branch/save         | POST   | Create new branch         | 新しいブランチを作成       |
-| /branch/save         | PUT    | Update existing branch    | 既存ブランチを更新         |
+| /branch/update         | PUT    | Update existing branch    | 既存ブランチを更新         |
 | /branch/deactivate   | DELETE | Deactivate a branch       | ブランチを無効化           |
 | /branch/getActive    | GET    | Fetch all active branches | アクティブブランチを取得   |
 | /branch/getAll       | GET    | Fetch all branches        | 全ブランチを取得           |
